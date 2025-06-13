@@ -9,13 +9,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Highlight.js CSS untuk tema terang (default) -->
     <link id="highlightTheme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
-    <!-- Pako.js untuk kompresi/dekompresi data -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
 
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f2f5; /* Warna latar belakang mode terang */
+            /* Latar belakang mode terang: gradien biru-ungu muda */
+            background-color: #f0f2f5; /* Fallback */
             transition: background-color 0.3s ease; /* Transisi halus */
         }
         .dark body {
@@ -166,7 +165,7 @@
                 highlightThemeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css';
             } else {
                 document.documentElement.classList.remove('dark');
-                // Ganti tema highlight.js ke light
+                // Ganti tema highlight.js ke light (github.min.css adalah tema terang)
                 highlightThemeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css';
             }
             updateThemeToggleIcon();
@@ -200,20 +199,6 @@
             hljs.highlightElement(codeContent);
         });
 
-        // Fungsi untuk mengonversi string menjadi Uint8Array
-        function stringToUint8Array(str) {
-            const arr = new Uint8Array(str.length);
-            for (let i = 0; i < str.length; i++) {
-                arr[i] = str.charCodeAt(i);
-            }
-            return arr;
-        }
-
-        // Fungsi untuk mengonversi Uint8Array menjadi string (yang bisa di-btoa)
-        function uint8ArrayToString(arr) {
-            return String.fromCharCode.apply(null, arr);
-        }
-
         // Muat data dari URL saat halaman dimuat
         window.onload = () => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -221,17 +206,9 @@
 
             if (dataParam) {
                 try {
-                    // Dekode Base64 kembali ke binary string
-                    const binaryString = atob(dataParam);
-
-                    // Konversi binary string kembali ke Uint8Array
-                    const compressedUint8Array = stringToUint8Array(binaryString);
-
-                    // Dekompres data menggunakan pako (Inflate)
-                    const decompressedData = pako.inflate(compressedUint8Array, { to: 'string' }); // to: 'string' untuk output langsung string
-
-                    // Parse JSON dari data yang sudah didekompresi
-                    const parsedData = JSON.parse(decompressedData);
+                    // Dekode Base64 kembali, lalu dekode URI component, lalu parse JSON
+                    const decodedData = decodeURIComponent(atob(dataParam));
+                    const parsedData = JSON.parse(decodedData);
 
                     if (parsedData.title) {
                         codeTitle.textContent = parsedData.title;

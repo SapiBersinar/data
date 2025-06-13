@@ -7,8 +7,6 @@
     <!-- Tailwind CSS CDN untuk styling yang cepat dan responsif -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Pako.js untuk kompresi/dekompresi data -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
     <script>
         // Mengatur preferensi mode gelap saat pemuatan awal
         // Jika preferensi tersimpan 'dark' atau sistem memilih dark, tambahkan kelas 'dark' ke elemen html
@@ -21,7 +19,8 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f2f5; /* Warna latar belakang mode terang */
+            /* Latar belakang mode terang: gradien biru-ungu muda */
+            background-color: #f0f2f5; /* Fallback */
             transition: background-color 0.3s ease; /* Transisi halus untuk perubahan warna */
         }
         .dark body {
@@ -178,20 +177,6 @@
         });
 
 
-        // Fungsi untuk mengonversi string menjadi Uint8Array
-        function stringToUint8Array(str) {
-            const arr = new Uint8Array(str.length);
-            for (let i = 0; i < str.length; i++) {
-                arr[i] = str.charCodeAt(i);
-            }
-            return arr;
-        }
-
-        // Fungsi untuk mengonversi Uint8Array menjadi string (yang bisa di-btoa)
-        function uint8ArrayToString(arr) {
-            return String.fromCharCode.apply(null, arr);
-        }
-
         // Fungsi untuk membuat URL
         generateUrlButton.addEventListener('click', () => {
             const title = titleInput.value.trim();
@@ -219,15 +204,8 @@
             // Ubah objek data menjadi string JSON
             const jsonData = JSON.stringify(data);
 
-            // Kompres data menggunakan pako (Deflate)
-            // Mengubah string JSON menjadi Uint8Array sebelum kompresi
-            const compressedUint8Array = pako.deflate(stringToUint8Array(jsonData), { level: 9 }); // level 9 = kompresi maksimum
-
-            // Ubah Uint8Array hasil kompresi menjadi binary string yang aman untuk btoa
-            const binaryString = uint8ArrayToString(compressedUint8Array);
-
-            // Encode binary string ke Base64
-            const encodedData = btoa(binaryString);
+            // Encode string JSON ke Base64 (menggunakan encodeURIComponent untuk karakter khusus)
+            const encodedData = btoa(encodeURIComponent(jsonData));
 
             // Hardcode base URL untuk halaman penampil
             const baseUrlForViewer = 'https://SapiBersinar.github.io/data/'; // Sesuaikan dengan domain GitHub Pages Anda
@@ -269,17 +247,9 @@
 
             if (dataParam) {
                 try {
-                    // Dekode Base64 kembali ke binary string
-                    const binaryString = atob(dataParam);
-
-                    // Konversi binary string kembali ke Uint8Array
-                    const compressedUint8Array = stringToUint8Array(binaryString);
-
-                    // Dekompres data menggunakan pako (Inflate)
-                    const decompressedData = pako.inflate(compressedUint8Array, { to: 'string' }); // to: 'string' untuk output langsung string
-
-                    // Parse JSON dari data yang sudah didekompresi
-                    const parsedData = JSON.parse(decompressedData);
+                    // Dekode Base64 kembali, lalu dekode URI component, lalu parse JSON
+                    const decodedData = decodeURIComponent(atob(dataParam));
+                    const parsedData = JSON.parse(decodedData);
 
                     // Isi input dengan data yang diurai
                     if (parsedData.title) {
