@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="displayTitle">Lihat Kode</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Highlight.js CSS untuk tema terang (default) -->
+    <link id="highlightTheme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* Warna latar belakang mode terang */
+            transition: background-color 0.3s ease; /* Transisi halus */
+        }
+        .dark body {
+            background-color: #1a202c; /* Warna latar belakang mode gelap */
+        }
+        .container {
+            background-color: #ffffff; /* Warna latar belakang kontainer mode terang */
+            transition: background-color 0.3s ease; /* Transisi halus */
+        }
+        .dark .container {
+            background-color: #2d3748; /* Warna latar belakang kontainer mode gelap */
+        }
+        /* Penyesuaian warna teks untuk mode gelap */
+        .dark .text-gray-800, .dark .text-gray-100 {
+            color: #e2e8f0;
+        }
+        .dark .text-gray-600, .dark .text-gray-300 {
+            color: #cbd5e0;
+        }
+        /* Penyesuaian tombol untuk mode gelap */
+        .dark .bg-blue-600 {
+            background-color: #63b3ed;
+        }
+        .dark .hover\:bg-blue-700:hover {
+            background-color: #4299e1;
+        }
+        .dark .bg-gray-200 {
+            background-color: #4a5568; /* Warna tombol abu-abu lebih gelap */
+        }
+        .dark .hover\:bg-gray-300:hover {
+            background-color: #636b77;
+        }
+        /* Penyesuaian pre dan code untuk highlight.js */
+        pre {
+            padding: 1.25rem; /* Setara dengan p-5 Tailwind */
+            border-radius: 0.5rem; /* Setara dengan rounded-lg Tailwind */
+            overflow-x: auto; /* Aktifkan scroll horizontal untuk baris panjang */
+            white-space: pre-wrap; /* Wrap baris panjang */
+            word-break: break-all; /* Putus kata jika perlu */
+            background-color: #f7fafc; /* Warna latar belakang default untuk code block di mode terang */
+        }
+        .dark pre {
+            background-color: #1a202c; /* Warna latar belakang untuk code block di mode gelap */
+            border-color: #4a5568;
+        }
+        code {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+            font-size: 0.875rem; /* Setara dengan text-sm Tailwind */
+        }
+        /* Penyesuaian pesan konfirmasi salin */
+        .dark #copyMessage {
+            color: #68d391;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4 sm:p-6 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-800 dark:to-gray-900 transition-colors duration-300">
+    <!-- Tombol toggle mode gelap/terang -->
+    <div class="absolute top-4 right-4">
+        <button id="themeToggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-300">
+            ☀️
+        </button>
+    </div>
+
+    <div class="container bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-4xl transition-colors duration-300">
+        <h1 id="codeTitle" class="text-3xl font-bold text-center text-gray-800 dark:text-gray-100 mb-6 sm:mb-8">Memuat Kode...</h1>
+        <p id="codeTypeDisplay" class="text-center text-gray-600 dark:text-gray-300 mb-4"></p>
+
+        <!-- Area tampilan kode -->
+        <div class="relative mb-6">
+            <pre class="overflow-auto rounded-lg shadow-inner border border-gray-200 dark:border-gray-700 transition-colors duration-300">
+                <code id="codeContent" class="language-plaintext"></code>
+            </pre>
+            <button id="copyCodeButton" class="absolute top-2 right-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 p-2 rounded-md text-sm font-semibold opacity-75 hover:opacity-100 transition-opacity duration-200">
+                Salin Kode
+            </button>
+        </div>
+
+        <!-- Pesan konfirmasi salin -->
+        <div id="copyMessage" class="hidden text-center text-sm font-medium text-green-700 dark:text-green-400 mt-2">
+            Kode berhasil disalin!
+        </div>
+
+        <!-- Tombol kembali ke Pembuat -->
+        <div class="text-center mt-6">
+            <a href="./create/" class="inline-block bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200 transform hover:scale-105">
+                Buat Kode Lain
+            </a>
+        </div>
+    </div>
+
+    <!-- Highlight.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <!-- Highlight.js language definitions (memuat beberapa yang umum) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/lua.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/xml.min.js"></script> <!-- Untuk HTML -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/css.min.js"></script>
+
+    <script>
+        const codeTitle = document.getElementById('codeTitle');
+        const codeTypeDisplay = document.getElementById('codeTypeDisplay');
+        const codeContent = document.getElementById('codeContent');
+        const copyCodeButton = document.getElementById('copyCodeButton');
+        const copyMessage = document.getElementById('copyMessage');
+        const displayTitle = document.getElementById('displayTitle');
+        const highlightThemeLink = document.getElementById('highlightTheme');
+        const themeToggle = document.getElementById('themeToggle');
+
+        // Fungsi untuk menyembunyikan pesan setelah beberapa waktu
+        function hideMessage(element) {
+            setTimeout(() => {
+                element.classList.add('hidden');
+            }, 3000); // Sembunyikan setelah 3 detik
+        }
+
+        // Mengatur preferensi tema saat pemuatan halaman
+        function applyThemeOnLoad() {
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                // Ganti tema highlight.js ke dark
+                highlightThemeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css';
+            } else {
+                document.documentElement.classList.remove('dark');
+                // Ganti tema highlight.js ke light
+                highlightThemeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css';
+            }
+            updateThemeToggleIcon();
+        }
+
+        // Fungsi untuk memperbarui ikon toggle tema
+        function updateThemeToggleIcon() {
+            if (document.documentElement.classList.contains('dark')) {
+                themeToggle.textContent = '🌙'; // Ikon bulan untuk mode gelap
+            } else {
+                themeToggle.textContent = '☀️'; // Ikon matahari untuk mode terang
+            }
+        }
+
+        // Inisialisasi tema saat halaman dimuat
+        applyThemeOnLoad();
+
+        // Logika toggle tema
+        themeToggle.addEventListener('click', () => {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+                highlightThemeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+                highlightThemeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css';
+            }
+            updateThemeToggleIcon();
+            // Sorot ulang kode setelah perubahan tema untuk memastikan warna diperbarui
+            hljs.highlightElement(codeContent);
+        });
+
+
+        // Muat data dari URL saat halaman dimuat
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const dataParam = urlParams.get('data');
+
+            if (dataParam) {
+                try {
+                    // Dekode Base64, lalu dekode URI component, lalu parse JSON
+                    const decodedData = decodeURIComponent(atob(dataParam));
+                    const parsedData = JSON.parse(decodedData);
+
+                    if (parsedData.title) {
+                        codeTitle.textContent = parsedData.title;
+                        displayTitle.textContent = `Kode: ${parsedData.title}`; // Perbarui judul tab browser
+                    } else {
+                        codeTitle.textContent = "Kode Tanpa Judul";
+                        displayTitle.textContent = "Kode Tanpa Judul";
+                    }
+
+                    if (parsedData.type) {
+                        codeTypeDisplay.textContent = `Jenis: ${parsedData.type.toUpperCase()}`;
+                        codeContent.className = `language-${parsedData.type.toLowerCase()}`; // Atur kelas untuk highlight.js
+                    } else {
+                        codeTypeDisplay.textContent = "Jenis: Tidak Diketahui";
+                        codeContent.className = 'language-plaintext'; // Default ke plaintext
+                    }
+
+                    if (parsedData.code) {
+                        codeContent.textContent = parsedData.code;
+                        hljs.highlightElement(codeContent); // Sorot kode
+                    } else {
+                        codeContent.textContent = "Tidak ada kode untuk ditampilkan.";
+                    }
+
+                } catch (e) {
+                    codeTitle.textContent = "Kesalahan Memuat Kode";
+                    codeTypeDisplay.textContent = "";
+                    codeContent.textContent = "Terjadi kesalahan saat mencoba memuat atau mengurai data kode dari URL. Pastikan URL valid.";
+                    console.error("Error parsing code from URL:", e);
+                }
+            } else {
+                codeTitle.textContent = "Tidak Ada Kode Ditemukan";
+                codeTypeDisplay.textContent = "";
+                codeContent.textContent = "URL tidak memiliki parameter 'data' yang berisi kode untuk ditampilkan.";
+            }
+        };
+
+        // Salin kode ke clipboard
+        copyCodeButton.addEventListener('click', () => {
+            const codeToCopy = codeContent.textContent;
+            const textArea = document.createElement("textarea");
+            textArea.value = codeToCopy;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    copyMessage.classList.remove('hidden');
+                    hideMessage(copyMessage);
+                } else {
+                    console.error("Gagal menyalin kode.");
+                }
+            } catch (err) {
+                console.error("Gagal menyalin kode: ", err);
+            }
+            document.body.removeChild(textArea);
+        });
+    </script>
+</body>
+</html>
+
